@@ -1,29 +1,14 @@
 import os
+import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-# Set up hidden (headless) Chrome browser
 chrome_options = Options()
-chrome_options.add_argument("--headless")  # Runs without a visual window
+chrome_options.add_argument("--headless")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--window-size=1920,1080")
+# Makes the browser look like a real person to pass security checks
+chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
-driver = webdriver.Chrome(options=chrome_options)
-
-try:
-    # Your target AFK rewards website
-    target_url = "https://altare.gg" 
-    
-    print(f"Opening website: {target_url}")
-    driver.get(target_url)
-    
-    # Wait 5 seconds for the page elements to fully load
-    driver.implicitly_wait(5)
-    
-    # Check if the page loaded successfully
-    print(f"Success! Page title is: {driver.title}")
-
-finally:
-    # Safeguard to close the browser session cleanly
-    driver.quit()
+driver = 
