@@ -1,30 +1,29 @@
 import os
 import time
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+import undetected_selenium as uc
 
-chrome_options = Options()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--window-size=1920,1080")
-# Makes the cloud browser mimic a regular Windows computer user agent
-chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+options = uc.ChromeOptions()
+options.add_argument("--headless")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--window-size=1920,1080")
 
-driver = webdriver.Chrome(options=chrome_options)
+# Launch the anti-detect cloud browser
+driver = uc.Chrome(options=options)
 
 try:
     target_url = "https://altare.gg"
     
-    # Open the home domain first so the browser allows cookie injections
+    # 1. Visit domain first so the browser accepts cookies
+    print("Navigating to home domain...")
     driver.get("https://altare.gg")
-    time.sleep(3)
+    time.sleep(5)
     
-    # Grab the hidden security secrets from your repository settings
+    # 2. Get your secret keys
     altare_session = os.environ.get("ALTARE_SESSION")
     cf_clearance = os.environ.get("CF_CLEARANCE")
     
-    # Inject the Cloudflare verification cookie
+    # 3. Inject Cloudflare cookie bypass
     if cf_clearance:
         driver.add_cookie({
             "name": "cf_clearance",
@@ -34,7 +33,7 @@ try:
         })
         print("Cloudflare verification cookie injected.")
 
-    # Inject your active login account cookie
+    # 4. Inject your login session cookie
     if altare_session:
         driver.add_cookie({
             "name": "altare_session",
@@ -44,15 +43,15 @@ try:
         })
         print("Login session cookie injected.")
 
-    # Open your target page fully authenticated
+    # 5. Open your rewards page fully bypassed
     print(f"Opening rewards page: {target_url}")
     driver.get(target_url)
-    time.sleep(5)
     
-    # Logs to verify if you successfully bypassed the login screen
+    # Keep the tab active on the page for 30 seconds so it registers you as AFK
+    time.sleep(30)
+    
     print(f"Current location verified as: {driver.current_url}")
     print(f"Page title confirmation: {driver.title}")
 
 finally:
-    # Always close the clean background session
     driver.quit()
