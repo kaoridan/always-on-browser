@@ -1,57 +1,38 @@
 import os
-import time
-import undetected_selenium as uc
-
-options = uc.ChromeOptions()
-options.add_argument("--headless")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
-options.add_argument("--window-size=1920,1080")
-
-# Launch the anti-detect cloud browser
-driver = uc.Chrome(options=options)
+import urllib.request
 
 try:
+    # 1. Target URL
     target_url = "https://altare.gg"
     
-    # 1. Visit domain first so the browser accepts cookies
-    print("Navigating to home domain...")
-    driver.get("https://altare.gg")
-    time.sleep(5)
-    
-    # 2. Get your secret keys
+    # 2. Extract your saved cookies from GitHub Secrets
     altare_session = os.environ.get("ALTARE_SESSION")
     cf_clearance = os.environ.get("CF_CLEARANCE")
     
-    # 3. Inject Cloudflare cookie bypass
-    if cf_clearance:
-        driver.add_cookie({
-            "name": "cf_clearance",
-            "value": cf_clearance,
-            "domain": ".altare.gg",
-            "path": "/"
-        })
-        print("Cloudflare verification cookie injected.")
-
-    # 4. Inject your login session cookie
-    if altare_session:
-        driver.add_cookie({
-            "name": "altare_session",
-            "value": altare_session,
-            "domain": ".altare.gg",
-            "path": "/"
-        })
-        print("Login session cookie injected.")
-
-    # 5. Open your rewards page fully bypassed
-    print(f"Opening rewards page: {target_url}")
-    driver.get(target_url)
+    # 3. Format the data string that your PC browser normally sends
+    cookie_header = f"altare_session={altare_session}; cf_clearance={cf_clearance}"
     
-    # Keep the tab active on the page for 30 seconds so it registers you as AFK
-    time.sleep(30)
+    # 4. Mimic a standard Windows Chrome network request header
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Cookie": cookie_header,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5"
+    }
     
-    print(f"Current location verified as: {driver.current_url}")
-    print(f"Page title confirmation: {driver.title}")
+    print("Sending network connection ping with credentials...")
+    req = urllib.request.Request(target_url, headers=headers)
+    
+    # 5. Open connection channel
+    with urllib.request.urlopen(req) as response:
+        html = response.read().decode('utf-8')
+        print(f"Server Response Status Code: {response.getcode()}")
+        
+        # Verify if page loaded successfully
+        if "login" in response.geturl().lower():
+            print("Status: Session expired or blocked. Re-routing back to login wall.")
+        else:
+            print("Success! Connection established and AFK session renewed successfully.")
 
-finally:
-    driver.quit()
+except Exception as e:
+    print(f"An execution issue occurred: {e}")
