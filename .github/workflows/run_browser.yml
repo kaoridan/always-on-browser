@@ -2,7 +2,6 @@ name: Run Background Browser
 
 on:
   schedule:
-    # Runs automatically every 15 minutes, 24/7
     - cron: '*/15 * * * *'
   workflow_dispatch:
 
@@ -18,10 +17,10 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Install Selenium Browser Driver
+    - name: Install Anti-Detect Browser Driver
       run: |
         python -m pip install --upgrade pip
-        pip install selenium
+        pip install undetected-selenium
 
     - name: Execute Browser Session
       env:
